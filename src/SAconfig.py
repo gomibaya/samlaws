@@ -8,27 +8,23 @@ __status__ = "Beta"
 __version__ = "0.1.0b1"
 
 from SAlogger import SAlogger
+from SAserialize import SAserialize
 import os
 # python 3.5
 from pathlib import Path
-import yaml
 
 
 class SAconfig(SAlogger):
     _DEF_DIR = '.samlaws'
-    _DEF_LISTFILE = 'conlist.yml'
-    _TEMPLATES_TYPES = ('putty')
+    _DEF_CFGFILE = 'config.yml'
     _MSG = (
         'No puedo crear directorio {0}.',
         'Creado directorio {0}.',
-        'No existe listado conexiones {0}.',
-        'Template no soportado.',
-        '{dir}{sep}templ{template}.txt',
-        'No existe template {0}.'
+        'No existe fichero configuración {0}.'
         )
 
     _configpath = ''
-    _listfile = ''
+    _cfgfile = ''
 
     """Configuracion aplicación"""
     def __init__(self, configpath=None):
@@ -51,44 +47,24 @@ class SAconfig(SAlogger):
             else:
                 self.info(1, configpath)
         self._configpath = configpath
-        self._listfile = self._filename_list()
+        self._cfgfile = self._filename_cfg()
 
-    def _filename_list(self):
-        ret = self._configpath + os.path.sep + self._DEF_LISTFILE
+    def _filename_cfg(self):
+        ret = self._configpath + os.path.sep + self._DEF_CFGFILE
         if not os.path.isfile(ret):
             self.critical(2, ret)
             ret = ''
         return ret
 
-    def filename_list(self):
-        return self._listfile
+    def filename_cfg(self):
+        return self._cfgfile
 
-    def _filename_template(self, template='putty'):
-        ret = ''
-        template = template.lower()
-        if template not in self._TEMPLATES_TYPES:
-            self.critical(3)
-            return ret
-        ret = self._MSG[4].format(
-            dir=self._configpath,
-            sep=os.path.sep,
-            template=template)
-        if not os.path.isfile(ret):
-            self.critical(5, ret)
-            ret = ''
-        return ret
-
-    def load_list(self):
-        ret = {}
-        if self._listfile:
-            with open(self._listfile, 'r') as f:
-                ret = yaml.safe_load(f)
-        return ret
-
-    def read_template(self, template='putty'):
-        """Read template. De momento, sólo putty"""
-        ftemplate = self._filename_template(template)
-        ret = Path(ftemplate).read_text() if ftemplate else ''
+    def load_cfg(self, defaults=None):
+        ret = SAserialize().unserialize(self._cfgfile)
+        if defaults:
+            for item in defaults:
+                tmp = ret.get(item, defaults[item])
+                ret[item] = tmp
         return ret
 
 

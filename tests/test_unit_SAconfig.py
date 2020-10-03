@@ -1,94 +1,83 @@
 import unittest
 import logging
 from SAconfig import SAconfig
+from SAserialize import SAserialize
 import os
 from pathlib import Path
-import json
+import shutil
 
 
 class TestSAconfig(unittest.TestCase):
+    
+    _CFGDIR = '.samlaws_test'
+    _CFGFILE = 'config.yml'
+    _REALCFGDIR = '.samlaws'
 
     def setUp(self):
         print('Test SAconfig')
-        self.dir = str(Path.home()) + os.path.sep + '.samlaws'
-        self.list = self.dir + os.path.sep + 'conlist.yml'
+        self.outputdir = str(os.getcwd()) + os.path.sep + 'output'
+        if not os.path.isdir(self.outputdir):
+            os.mkdir(self.outputdir)        
+        self.dir = self.outputdir + os.path.sep + self._CFGDIR
+        self.cfg = self.dir + os.path.sep + self._CFGFILE
         self.listdata1 = [{'name': 'prueba'}]
-        self.templateputty = self.dir + os.path.sep + 'templ' + 'putty'
 
     def test_createdir_ok(self):
         print('Sin directorio. Crea en el home')
+        cpath = str(Path.home()) + os.path.sep + self._REALCFGDIR
+        shutil.rmtree(cpath, ignore_errors=True)
         SAconfig()
-        cpath = str(Path.home()) + os.path.sep + '.samlaws'
         t = os.path.isdir(cpath)
+        os.rmdir(cpath)
         self.assertEqual(t, True)
         
     def test_createdir_param(self):
         print('Con directorio. Crea en directorio trabajo')
-        SAconfig('dirprueba')
-        cpath = str(os.getcwd()) + os.path.sep + 'dirprueba'
-        t = os.path.isdir(cpath)
+        SAconfig(self.dir)
+        t = os.path.isdir(self.dir)
+        os.rmdir(self.dir)
         self.assertEqual(t, True)
-        os.rmdir(cpath)
 
-    def test_filenameList_unexistent(self):
-        print('Obtener el filenameList, no existe')
+    def test_filenamecfg_unexistent(self):
+        print('Obtener el filenamecfg, no existe')
         try:
-            os.remove(self.list)
+            os.remove(self.cfg)
         except Exception:
             pass
-        config = SAconfig()
-        t = config.filename_list()
+        config = SAconfig(self.dir)
+        t = config.filename_cfg()
         self.assertEqual(t, '')
 
-    def test_filenameList_existent(self):
-        print('Obtener el filenameList, existe')
+    def test_filenamecfg_existent(self):
+        print('Obtener el filenamecfg, existe')
         # he de crearlo antes de iniciarlizar el config
         # que lo lee sólo al principio
-        cpath = str(os.getcwd()) + os.path.sep + 'dirprueba'
-        list = cpath + os.path.sep + 'conlist.yml'
-        os.mkdir(cpath)     
-        with open(list,'w+') as f:
-            f.write(json.dumps(self.listdata1))
-        config = SAconfig('dirprueba')
-        t = config.filename_list()
-        # Si lo pongo después del assertion y falla, no borrará el contenido
-        os.remove(list)
-        os.rmdir(cpath)        
-        self.assertEqual(t, list)
+        if not os.path.isdir(self.dir):
+            os.mkdir(self.dir)         
+        writer = SAserialize(self.cfg)
+        writer.serialize(self.listdata1)
+        self.assertTrue(os.path.isfile(self.cfg))
 
-    def test_loadList_existent(self):
-        print('Obtener el objeto de filenameList, existe')
+        config = SAconfig(self.dir)
+        t = config.filename_cfg()
+        # Si lo pongo después del assertion y falla, no borrará el contenido
+        os.remove(self.cfg)
+        os.rmdir(self.dir)        
+        self.assertEqual(t, self.cfg)
+
+    def test_loadcfg_existent(self):
+        print('Obtener el objeto de filenamecfg, existe')
         # he de crearlo antes de iniciarlizar el config
         # que lo lee sólo al principio
-        cpath = str(os.getcwd()) + os.path.sep + 'dirprueba'
-        list = cpath + os.path.sep + 'conlist.yml'
-        os.mkdir(cpath)     
-        with open(list,'w+') as f:
-            f.write(json.dumps(self.listdata1))
-        config = SAconfig('dirprueba')
-        t = config.load_list()
+        writer = SAserialize(self.cfg)
+        writer.serialize(self.listdata1)             
+
+        config = SAconfig(self.dir)
+        t = config.load_cfg()
         # Si lo pongo después del assertion y falla, no borrará el contenido
-        os.remove(list)
-        os.rmdir(cpath)        
+        os.remove(self.cfg)
+        os.rmdir(self.dir)        
         self.assertEqual(t, self.listdata1)
-
-    def test_filenameTemplate_putty_vacio(self):
-        print('Obtener el filenameTemplate')
-        config = SAconfig()
-        t = config.read_template('putty')
-        self.assertEqual(t, '')
-
-    def test_filenameTemplate_putty_caseupper_vacio(self):
-        print('Obtener el filenameTemplate')
-        config = SAconfig()
-        t = config.read_template('Putty')
-        self.assertEqual(t, '')
-
-    def test_filenameTemplate_nosupported_fail(self):
-        print('Obtener el filenameTemplate')
-        config = SAconfig()
-        t = config.read_template('Other')
-        self.assertEqual(t, '')
 
 
 if __name__ == '__main__':

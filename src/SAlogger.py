@@ -10,13 +10,13 @@ __version__ = "0.1.0b1"
 import logging
 
 
-class SAogger(object):
+class SAlogger(object):
 
     _DEFAULTMSG = 'Error en log. No existe el codigo proporcionado'
 
     """Configuracion aplicación"""
     def __init__(self, logger=None):
-        self.__logger = logger or logging.getLogger(self.__class__.__name__)
+        self._logger = logger or logging.getLogger(self.__class__.__name__)
 
     def __log(self, level, idxmsg, *args):
         try:
@@ -24,10 +24,7 @@ class SAogger(object):
         except AttributeError:
             msg = self._DEFAULTMSG
         fmsg = msg.format(*args)
-        # print('Level: {0} idxmsg: {1} msg {2}'.format(level,
-        #                                              idxmsg,
-        #                                              fmsg))
-        self.__logger.log(level, fmsg)
+        self._logger.log(level, fmsg)
         return fmsg
 
     def debug(self, idxmsg, *args):

@@ -13,12 +13,19 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/gomibaya/samlaws/",
     packages=setuptools.find_packages(),
+    install_requires=[
+        'requests',
+        'beautifulsoup4',
+        'bs4',
+        'boto3',
+        'defusedxml'
+        ],
     classifiers=[
         # How mature is this project? Common values are
         #   3 - Alpha
         #   4 - Beta
         #   5 - Production/Stable
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3 :: Only",
         "Programming Language :: Python :: 3.6",

@@ -2,7 +2,7 @@ import unittest
 import logging
 from SAlogger import SAlogger
 
-class testlog(SAlogger):
+class Testlog(SAlogger):
     _MSG = (
         'Msg sin params.',
         'Msg with 1 param {0}.'
@@ -29,7 +29,7 @@ class TestSAlogger(unittest.TestCase):
 
     def test_init_incorrectindex(self):
         print('init con index incorrecto')
-        log = testlog()
+        log = Testlog()
         log.info(1, 'hola')
 
 if __name__ == '__main__':
