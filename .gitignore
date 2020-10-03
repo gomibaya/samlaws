@@ -1,0 +1,13 @@
+build/
+dist/
+output/
+.tox/
+*.egg-info/
+constraints.txt
+venv/
+bandit-env/
+src/__pycache__/
+#Eclipse
+.project
+.pydevproject
+.settings/

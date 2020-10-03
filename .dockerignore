@@ -1,0 +1,7 @@
+.git
+.gitignore
+#Eclipse
+.project
+.pydevproject
+.settings/
+venv/

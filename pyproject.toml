@@ -1,0 +1,34 @@
+[build-system]
+requires = [ "setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.tox]
+legacy_tox_ini = """
+[base]
+srcdir =
+	src
+srcs =
+	modskeleton.py
+tests =
+	test_unit_modskeleton
+	
+[tox]
+envlist = py36,py37,py38
+skipsdist=false
+
+[testenv]
+setenv = PYTHONPATH = {toxinidir}:{toxinidir}/tests/
+deps =
+	varfilter
+	pylama
+	bandit
+commands = 
+	pylama {[base]tests}
+	pylama {[base]srcdir}
+	python -m unittest {[base]tests}
+	bandit -r {[base]srcdir}
+recreate = false
+alwayscopy = false
+download = true
+skip_install = false
+"""

@@ -1,0 +1,20 @@
+# 0.2.0: Modificado para que lea config de CONFIG
+
+if [ -f ./CONFIG ]; then
+        . ./CONFIG
+fi
+
+
+# SET THE FOLLOWING VARIABLES
+# docker hub username
+USERNAME=${USERNAME:-esteban}
+LOCALUSERNAME=${LOCALUSERNAME:-esteban}
+IMAGE=${IMAGE:-develop}
+# image name
+HUMANNAME=${HUMANNAME:-buster}
+VERSION=${VERSION:-buster}
+#VERSION="latest"
+if [ -f ./VERSION ]; then
+	NUMERICVERSION=$(cat VERSION)
+	VERSION="${VERSION}-${NUMERICVERSION}"
+fi
